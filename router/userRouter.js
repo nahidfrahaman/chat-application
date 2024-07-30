@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { getUsers, createUser } = require("../controller/usersController");
+const {
+  getUsers,
+  createUser,
+  deleteUser,
+} = require("../controller/usersController");
 const decorateHtmltitle = require("../middlewares/common/decorateHtml");
 const avatarUpload = require("../middlewares/users/avataruploads");
 
@@ -19,5 +23,7 @@ router.post(
   addUserValidatorHandler,
   createUser
 );
+
+router.delete("/:id", deleteUser);
 
 module.exports = router;

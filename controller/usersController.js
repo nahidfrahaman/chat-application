@@ -1,19 +1,23 @@
 const bcrypt = require("bcrypt");
 const User = require("../model/userModel");
 
-const getUsers = (req, res) => {
-  res.render("users");
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+
+    // send response in html
+    res.render("users", {
+      users: users,
+    });
+  } catch (ere) {}
 };
 
 const createUser = async (req, res) => {
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  console.log(hashedPassword);
 
   let newUser;
 
   if (req.files && req.files.length > 0) {
-    console.log(req.body.password);
-
     newUser = new User({
       ...req.body,
       avatar: req.files[0].filename,
@@ -35,8 +39,25 @@ const createUser = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
+    res.status(500).json({
+      errors: {
+        common: {
+          msg: "Unknown error occured",
+        },
+      },
+    });
+  }
+};
 
+const deleteUser = async (req, res) => {
+  try {
+    const users = await User.findByIdAndDelete(req.params.id);
+
+    // send response in html
+    res.status(200).json({
+      msg: "user deleted successfully",
+    });
+  } catch (ere) {
     res.status(500).json({
       errors: {
         common: {
@@ -50,4 +71,5 @@ const createUser = async (req, res) => {
 module.exports = {
   getUsers,
   createUser,
+  deleteUser,
 };
